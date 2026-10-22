@@ -1,6 +1,6 @@
 {
   "date": "2026-10-22",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "security": {
     "source_and_package_scan": "pass_with_heuristic_limitations",
     "package_file_count": 5,
@@ -45,7 +45,13 @@
     ],
     "dependencies": "system macOS frameworks plus separately installed trusted Codex CLI; no personal login bundled",
     "npm_node_launcher_with_spaces": "pass; selected bin supplies node while parent PATH lacks node",
-    "gui_interaction": "new CLI chooser compiled; not interactively tested"
+    "gui_interaction": "native menu structure tested; full multi-monitor GUI not tested",
+    "interface_languages": [
+      "zh-Hans",
+      "en"
+    ],
+    "language_persistence": "pass: isolated defaults save and restore",
+    "native_language_menu": "pass: both languages, language submenu and selected checkmark"
   },
   "distribution": {
     "signature": "ad-hoc with hardened runtime",
@@ -55,9 +61,9 @@
     "ready_for_unrestricted_public_binary_distribution": false
   },
   "artifact": {
-    "filename": "CodexQuotaBar-v1.2.0-macos-universal.zip",
-    "sha256": "4ba90b6f281cd4722a3328e45315ad8ff6245f1bb1bf11036aaf9c5bca18c863",
-    "bytes": 155200
+    "filename": "CodexQuotaBar-v1.3.0-macos-universal.zip",
+    "sha256": "0401933f5fffb52c4dc36bd1ad6d47a04e5e9e2b85a28829f070c9ac3a80642f",
+    "bytes": 170978
   },
   "check_run_did_not_publish": true
 }

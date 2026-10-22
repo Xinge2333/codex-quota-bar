@@ -6,9 +6,9 @@
 
 ## 下载
 
-- [下载 macOS 通用测试版 v1.2.0](https://github.com/Xinge2333/codex-quota-bar/releases/download/v1.2.0/CodexQuotaBar-v1.2.0-macos-universal.zip)
-- [发行说明与全部附件](https://github.com/Xinge2333/codex-quota-bar/releases/tag/v1.2.0)
-- [SHA-256 校验文件](https://github.com/Xinge2333/codex-quota-bar/releases/download/v1.2.0/SHA256SUMS)
+- [下载 macOS 通用测试版 v1.3.0](https://github.com/Xinge2333/codex-quota-bar/releases/download/v1.3.0/CodexQuotaBar-v1.3.0-macos-universal.zip)
+- [发行说明与全部附件](https://github.com/Xinge2333/codex-quota-bar/releases/tag/v1.3.0)
+- [SHA-256 校验文件](https://github.com/Xinge2333/codex-quota-bar/releases/download/v1.3.0/SHA256SUMS)
 
 也可以直接复制下面这段话给 Codex：
 
@@ -28,7 +28,7 @@
 
 ![独立关闭每周显示](docs/images/menu-five-hour-only.png)
 
-截图由作者提供，数字为截图时的示例，不能代表下载者的实时额度。新版本另外提供 CLI 选择和安装说明入口；应用当前界面为中文。
+截图由作者提供，数字为截图时的示例，不能代表下载者的实时额度。新版本另外提供 CLI 选择和安装说明入口；应用可在「语言 / Language」中切换简体中文或 English。
 
 ## 支持范围
 
@@ -62,6 +62,10 @@ shasum -a 256 -c SHA256SUMS
 6. 选择「退出额度条」退出。显示偏好和位置会保留；电脑重启后从「应用程序」重新打开，本版不自动开机启动。
 
 如果 CLI 是通过 npm/nvm/asdf 或其他非默认位置安装的，先执行 `which codex`，再通过「选择 Codex CLI…」选择相应的可信可执行文件。未登录时执行 `codex login`；接口不支持时升级 CLI。
+
+## 界面语言
+
+点击菜单栏额度图标 →「语言 / Language」→「简体中文」或「English」。切换立即生效，菜单、额度详情、重置次数、提示及帮助文字会同步切换；选择保存在本机，重启后保留。默认使用中文。
 
 ## 显示规则
 

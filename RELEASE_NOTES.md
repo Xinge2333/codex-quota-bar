@@ -1,10 +1,12 @@
-# v1.2.0 — 公开测试版 / Public test release
+# v1.3.0 — 公开测试版 / Public test release
 
 ## 中文
 
+新增完整英文界面。菜单 →「语言 / Language」可切换简体中文或 English，立即生效并记住选择。
+
 macOS 菜单栏与可选桌面悬浮额度条，显示 Codex 5 小时／每周剩余额度及重置时间。可分别开关两列显示，三类重置券独立统计。
 
-下载 `CodexQuotaBar-v1.2.0-macos-universal.zip`，解压后阅读「使用说明.txt」或 `INSTALL.en.txt`。ZIP 包含 Apple 芯片及 Intel 二进制。安装与功能说明及截图见 [中文 README](https://github.com/Xinge2333/codex-quota-bar/blob/main/README.md)。
+下载 `CodexQuotaBar-v1.3.0-macos-universal.zip`，解压后阅读「使用说明.txt」或 `INSTALL.en.txt`。ZIP 包含 Apple 芯片及 Intel 二进制。安装与功能说明及截图见 [中文 README](https://github.com/Xinge2333/codex-quota-bar/blob/main/README.md)。
 
 **使用前提及限制：**
 
@@ -18,14 +20,16 @@ macOS 菜单栏与可选桌面悬浮额度条，显示 Codex 5 小时／每周�
 
 ## English
 
+New: English interface and a **语言 / Language** submenu. Switch between Simplified Chinese and English instantly; your choice is remembered after restart.
+
 A macOS menu bar and optional floating desktop display for remaining five-hour and weekly Codex quotas. Columns can be toggled independently; reset credits are counted in separate categories.
 
-Download `CodexQuotaBar-v1.2.0-macos-universal.zip`, extract it, and read `INSTALL.en.txt`. The archive contains both arm64 and x86_64 binaries. See the [English guide and screenshots](https://github.com/Xinge2333/codex-quota-bar/blob/main/README.en.md).
+Download `CodexQuotaBar-v1.3.0-macos-universal.zip`, extract it, and read `INSTALL.en.txt`. The archive contains both arm64 and x86_64 binaries. See the [English guide and screenshots](https://github.com/Xinge2333/codex-quota-bar/blob/main/README.en.md).
 
 **Requirements and limitations:**
 
 - macOS 13+. Install a trusted Codex CLI separately and run `codex login` with your own account.
-- Use **选择 Codex CLI…** (Select Codex CLI…) if automatic discovery fails. The app UI is currently Chinese.
+- Use **选择 Codex CLI…** (Select Codex CLI…) if automatic discovery fails. Use **语言 / Language → English** to switch the interface.
 - This is an ad-hoc-signed, **unnotarized test build**, without a Developer ID signature. Gatekeeper may block an internet download. Do not disable system security protections.
 - Apple Silicon was tested on the development machine. Intel hardware and macOS 13 have not been tested. Account and CLI capabilities may differ.
 - The app only queries quota; it never redeems reset credits or starts model generation. Values are remaining percentages. All times use UTC+8.

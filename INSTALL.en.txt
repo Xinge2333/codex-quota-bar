@@ -1,4 +1,4 @@
-Codex Quota Bar 1.2.0 — universal macOS test build
+Codex Quota Bar 1.3.0 — universal macOS test build
 
 Requirements: macOS 13+, a trusted Codex CLI installation, and your own ChatGPT sign-in.
 The binary contains Apple Silicon and Intel slices. Intel and macOS 13 have not been tested on physical machines.
@@ -13,7 +13,10 @@ IMPORTANT: This build is ad-hoc signed, not Developer ID-signed or notarized.
 Gatekeeper may block an internet download. Do not disable macOS security protections.
 If macOS refuses to open it, wait for a properly signed and notarized release or review and build the source locally.
 
-The app interface is currently in Chinese:
+Switch the interface to English: click the menu bar item, then 语言 / Language → English.
+The choice takes effect immediately and is restored after restart. Default: Chinese.
+
+Chinese menu labels for reference:
 立即刷新 = Refresh now
 显示 5 小时用量 = Show five-hour quota
 显示周用量 = Show weekly quota

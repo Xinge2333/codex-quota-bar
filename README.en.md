@@ -2,13 +2,13 @@
 
 English · [中文](README.md)
 
-A small macOS menu bar app with an optional floating desktop bar for your remaining Codex quota. Built with Swift and AppKit. Quota queries use a separately installed Codex CLI. The app's interface is currently in Chinese; English setup and usage instructions are provided below.
+A small macOS menu bar app with an optional floating desktop bar for your remaining Codex quota. Built with Swift and AppKit. Quota queries use a separately installed Codex CLI. The interface supports Simplified Chinese and English, with an in-app language selector.
 
 ## Download
 
-- [Download v1.2.0 universal macOS test build](https://github.com/Xinge2333/codex-quota-bar/releases/download/v1.2.0/CodexQuotaBar-v1.2.0-macos-universal.zip)
-- [Release notes and all assets](https://github.com/Xinge2333/codex-quota-bar/releases/tag/v1.2.0)
-- [SHA256SUMS](https://github.com/Xinge2333/codex-quota-bar/releases/download/v1.2.0/SHA256SUMS)
+- [Download v1.3.0 universal macOS test build](https://github.com/Xinge2333/codex-quota-bar/releases/download/v1.3.0/CodexQuotaBar-v1.3.0-macos-universal.zip)
+- [Release notes and all assets](https://github.com/Xinge2333/codex-quota-bar/releases/tag/v1.3.0)
+- [SHA256SUMS](https://github.com/Xinge2333/codex-quota-bar/releases/download/v1.3.0/SHA256SUMS)
 
 You can also copy and paste this prompt into Codex:
 
@@ -28,7 +28,7 @@ Five-hour quota only, with the weekly column independently disabled:
 
 ![Weekly column disabled](docs/images/menu-five-hour-only.png)
 
-Screenshots are provided by the author. Values are examples captured at that time, not your current allowance. The current build also adds CLI selection and setup-help menu entries.
+Screenshots are provided by the author. Values are examples captured at that time, not your current allowance. The screenshots show the Chinese interface; the current build also includes language selection, CLI selection and setup-help entries.
 
 ## Requirements
 
@@ -55,6 +55,10 @@ shasum -a 256 -c SHA256SUMS
 
 A checksum verifies consistency with this release; it does not replace Developer ID signing or notarization.
 
+## Interface language
+
+Click the quota menu bar item → **语言 / Language** → **English** or **简体中文**. The menu, quota details, reset-credit labels, status messages and setup help update immediately. Your selection is saved locally and restored after restarting the app. The default is Chinese.
+
 ## Use
 
 The large number is the **remaining percentage**, not the percentage used. The small line is the quota reset time for the five-hour window or reset date for the weekly window. **All times use Asia/Shanghai (UTC+8)**. The app refreshes every 60 seconds; an orange state means connecting or potentially stale data.
@@ -69,6 +73,7 @@ The large number is the **remaining percentage**, not the percentage used. The s
 | 使用 24 小时制 | Use a 24-hour clock |
 | 选择 Codex CLI… | Select the installed CLI executable |
 | 安装与登录说明… | Show setup and sign-in help |
+| 语言 / Language | Switch between Simplified Chinese and English |
 | 退出额度条 | Quit |
 
 Each quota column can be toggled independently. If both are hidden, the menu bar keeps an **额度** (Quota) entry so you can enable them again. Drag the floating bar to move it; right-click it to open the menu. Your display preferences and position are stored locally. After restarting your Mac, open the app again from Applications; this version does not enable launch at login.

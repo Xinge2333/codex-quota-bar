@@ -28,7 +28,7 @@ python3 - "$quota_build/stage" "$quota_root/dist" <<'PY'
 from pathlib import Path
 import hashlib, sys, zipfile
 stage, dist = map(Path, sys.argv[1:])
-archive = dist / 'CodexQuotaBar-v1.2.0-macos-universal.zip'
+archive = dist / 'CodexQuotaBar-v1.3.0-macos-universal.zip'
 with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:
     for path in sorted(stage.rglob('*')):
         if path.is_file():
@@ -41,6 +41,6 @@ digest = hashlib.sha256(archive.read_bytes()).hexdigest()
 (dist / 'SHA256SUMS').write_text(f'{digest}  {archive.name}\n')
 print(f'Created {archive.name}; SHA256 {digest}')
 PY
-python3 scripts/audit.py --archive dist/CodexQuotaBar-v1.2.0-macos-universal.zip
+python3 scripts/audit.py --archive dist/CodexQuotaBar-v1.3.0-macos-universal.zip
 printf 'Universal architectures: '
 lipo -archs "$quota_binary"

@@ -2,6 +2,72 @@ import AppKit
 import Foundation
 import Darwin
 
+enum AppLanguage: String, CaseIterable {
+    case chinese = "zh-Hans", english = "en"
+    static var testOverride: AppLanguage?
+    static var current: AppLanguage {
+        testOverride ?? saved(in: .standard)
+    }
+    static func saved(in defaults: UserDefaults) -> AppLanguage {
+        defaults.string(forKey: "interfaceLanguage").flatMap(AppLanguage.init(rawValue:)) ?? .chinese
+    }
+    func save(in defaults: UserDefaults = .standard) { defaults.set(rawValue, forKey: "interfaceLanguage") }
+}
+private let englishStrings: [String: String] = [
+    "5 小时重置次数": "5-hour reset credits",
+    "每周重置次数": "Weekly reset credits",
+    "完全重置次数": "Full reset credits",
+    "查询中…": "Loading…",
+    "未提供": "Unavailable",
+    "未提供明细": "Details unavailable",
+    "未知": "Unknown",
+    "5 小时": "5-hour",
+    "每周": "Weekly",
+    "Marble 额度条": "Codex Quota Bar",
+    "Codex 剩余额度": "Codex remaining quota",
+    "立即刷新": "Refresh now",
+    "显示 5 小时用量": "Show 5-hour quota",
+    "显示周用量": "Show weekly quota",
+    "显示桌面悬浮条": "Show desktop bar",
+    "关闭桌面悬浮条": "Hide desktop bar",
+    "移回屏幕右上角": "Move to top-right",
+    "使用 24 小时制": "Use 24-hour time",
+    "选择 Codex CLI…": "Select Codex CLI…",
+    "安装与登录说明…": "Setup and sign-in help…",
+    "退出额度条": "Quit Quota Bar",
+    "额度": "Quota",
+    "用量显示已关闭": "Quota display is hidden",
+    "，数据待刷新": ", data awaiting refresh",
+    "拖动调整位置 · 右键打开菜单": "Drag to move · Right-click for menu",
+    "点击查看额度详情和操作": "Click for quota details and actions",
+    "\n正在连接…": "\nConnecting…",
+    "\n数据已过期，正在重试": "\nData is stale; retrying",
+    "选择已安装的 Codex CLI 可执行文件": "Select the installed Codex CLI executable",
+    "可在终端运行 which codex 查看位置。请仅选择你信任的 Codex CLI。": "Run which codex in Terminal to find its location. Only select a trusted Codex CLI.",
+    "所选文件不可执行": "The selected file is not executable",
+    "请选择 Codex CLI 可执行文件。": "Please select the Codex CLI executable.",
+    "额度条使用条件": "Quota Bar setup",
+    "好": "OK",
+    "选择": "Select",
+    "取消": "Cancel",
+    "未找到 Codex CLI；请在菜单中选择 CLI，并先运行 codex login。": "Codex CLI not found. Select the CLI in the menu and run codex login.",
+    "额度响应过大，已重新连接": "Quota response too large; reconnecting",
+    "连接已断开，正在重试": "Connection closed; retrying",
+    "无法启动 Codex 额度连接": "Unable to start the Codex quota connection",
+    "额度连接写入失败": "Unable to write to the quota connection",
+    "额度接口初始化失败": "Unable to initialize the quota interface",
+    "当前 Codex CLI 不支持额度接口，请升级 Codex CLI": "This Codex CLI does not support the quota interface. Update Codex CLI.",
+    "无法读取额度；请先运行 codex login，并确认账号支持 Codex 额度": "Unable to read quota. Run codex login and check that your account supports Codex quota.",
+    "当前登录未提供 Codex 额度数据": "The current sign-in did not provide Codex quota data",
+    "连接超时，稍后自动重试": "Connection timed out; retrying shortly",
+    "刷新超时，保留上次额度": "Refresh timed out; retaining the previous quota",
+    "正在重新连接 Codex CLI": "Reconnecting to Codex CLI"
+]
+func tr(_ text: String) -> String {
+    if AppLanguage.current == .english { return englishStrings[text] ?? text }
+    return englishStrings.first(where: { $0.value == text })?.key ?? text
+}
+
 struct QuotaWindow: Decodable {
     let usedPercent: Double?
     let windowDurationMins: Int?
@@ -16,9 +82,9 @@ enum ResetCategory: Int, CaseIterable {
     case fiveHour, weekly, full
     var label: String {
         switch self {
-        case .fiveHour: return "5 小时重置次数"
-        case .weekly: return "每周重置次数"
-        case .full: return "完全重置次数"
+        case .fiveHour: return tr("5 小时重置次数")
+        case .weekly: return tr("每周重置次数")
+        case .full: return tr("完全重置次数")
         }
     }
 }
@@ -66,11 +132,11 @@ struct QuotaResponse: Decodable {
 struct Formatter {
     static let zone = TimeZone(identifier: "Asia/Shanghai")!
     static func resetMenuTitles(_ credits: ResetCredits?, loading: Bool) -> [String] {
-        let unavailable = loading ? "查询中…" : (credits?.total == nil ? "未提供" : "未提供明细")
+        let unavailable = loading ? tr("查询中…") : (credits?.total == nil ? tr("未提供") : tr("未提供明细"))
         let counts = credits?.categoryCounts
         return ResetCategory.allCases.map { category in
-            let value = counts.map { "\($0[category.rawValue]) 次" } ?? unavailable
-            return "\(category.label)：\(value)"
+            let value = counts.map { AppLanguage.current == .english ? "\($0[category.rawValue])" : "\($0[category.rawValue]) 次" } ?? unavailable
+            return "\(category.label)\(AppLanguage.current == .english ? ": " : "：")\(value)"
         }
     }
 
@@ -82,10 +148,15 @@ struct Formatter {
         return "\(remaining)%(\(date.string(from: Date(timeIntervalSince1970: reset))))"
     }
     static func detail(_ window: QuotaWindow?, name: String) -> String {
-        guard let window = window, let remaining = window.remaining else { return "\(name)：暂未提供数据" }
-        let date = DateFormatter(); date.locale = Locale(identifier: "zh_CN"); date.timeZone = zone; date.dateFormat = "MM月dd日 HH:mm"
-        let reset = window.resetsAt.map { date.string(from: Date(timeIntervalSince1970: $0)) } ?? "未知"
-        return "\(name)：剩余 \(remaining)%，重置于 \(reset)（北京时间）"
+        let label = tr(name)
+        let english = AppLanguage.current == .english
+        guard let window = window, let remaining = window.remaining else {
+            return english ? "\(label): Data unavailable" : "\(label)：暂未提供数据"
+        }
+        let date = DateFormatter(); date.locale = Locale(identifier: english ? "en_US_POSIX" : "zh_CN"); date.timeZone = zone
+        date.dateFormat = english ? "MMM d, HH:mm" : "MM月dd日 HH:mm"
+        let reset = window.resetsAt.map { date.string(from: Date(timeIntervalSince1970: $0)) } ?? tr("未知")
+        return english ? "\(label): \(remaining)% remaining, resets \(reset) (UTC+8)" : "\(label)：剩余 \(remaining)%，重置于 \(reset)（北京时间）"
     }
     static func resetLabel(_ window: QuotaWindow?, weekly: Bool, twelveHour: Bool) -> String {
         guard let reset = window?.resetsAt else { return "--" }
@@ -198,7 +269,7 @@ final class QuotaClient {
     }
     private func connect() {
         guard !stopping, process == nil, Date() >= retryAt else { return }
-        guard let executable = Self.executable() else { onStatus?("未找到 Codex CLI；请在菜单中选择 CLI，并先运行 codex login。"); retryAt = Date().addingTimeInterval(60); return }
+        guard let executable = Self.executable() else { onStatus?(tr("未找到 Codex CLI；请在菜单中选择 CLI，并先运行 codex login。")); retryAt = Date().addingTimeInterval(60); return }
         let child = Process(); child.executableURL = URL(fileURLWithPath: executable)
         child.arguments = ["app-server", "--listen", "stdio://"]
         child.environment = Self.childEnvironment(ProcessInfo.processInfo.environment, executable: executable)
@@ -217,7 +288,7 @@ final class QuotaClient {
                     self.buffer.removeAll(keepingCapacity: false)
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self, self.generation == token else { return }
-                        self.resetConnection("额度响应过大，已重新连接")
+                        self.resetConnection(tr("额度响应过大，已重新连接"))
                     }
                     return
                 }
@@ -235,19 +306,19 @@ final class QuotaClient {
         }
         child.terminationHandler = { [weak self] _ in DispatchQueue.main.async {
             guard let self = self, self.generation == token else { return }
-            self.disconnected("连接已断开，正在重试")
+            self.disconnected(tr("连接已断开，正在重试"))
         } }
         do {
             try child.run(); process = child; input = stdinPipe.fileHandleForWriting
             initialized = false; startedAt = Date()
-            send(["id": 1, "method": "initialize", "params": ["clientInfo": ["name": "marble_quota_bar", "title": "Marble Quota Bar", "version": "1.2.0"]]])
-        } catch { disconnected("无法启动 Codex 额度连接") }
+            send(["id": 1, "method": "initialize", "params": ["clientInfo": ["name": "marble_quota_bar", "title": "Marble Quota Bar", "version": "1.3.0"]]])
+        } catch { disconnected(tr("无法启动 Codex 额度连接")) }
     }
     private func send(_ message: [String: Any]) {
         guard let method = message["method"] as? String, Self.permitsMethod(method),
               let input = input, var data = try? JSONSerialization.data(withJSONObject: message) else { return }
         data.append(10)
-        do { try input.write(contentsOf: data) } catch { resetConnection("额度连接写入失败") }
+        do { try input.write(contentsOf: data) } catch { resetConnection(tr("额度连接写入失败")) }
     }
     private func requestLimits() {
         requestID += 1; pending = requestID; pendingAt = Date()
@@ -255,7 +326,7 @@ final class QuotaClient {
     }
     private func receive(_ message: [String: Any]) {
         if let id = message["id"] as? Int, id == 1 {
-            guard message["error"] == nil else { resetConnection("额度接口初始化失败"); return }
+            guard message["error"] == nil else { resetConnection(tr("额度接口初始化失败")); return }
             initialized = true
             send(["method": "initialized", "params": [:]])
             requestLimits(); return
@@ -264,10 +335,10 @@ final class QuotaClient {
         if responseID != nil && responseID == pending {
             pending = nil; pendingAt = nil
             if let error = message["error"] as? [String: Any], error["code"] as? Int == -32601 {
-                onStatus?("当前 Codex CLI 不支持额度接口，请升级 Codex CLI"); return
+                onStatus?(tr("当前 Codex CLI 不支持额度接口，请升级 Codex CLI")); return
             }
             guard message["error"] == nil, let result = message["result"] as? [String: Any] else {
-                onStatus?("无法读取额度；请先运行 codex login，并确认账号支持 Codex 额度"); return
+                onStatus?(tr("无法读取额度；请先运行 codex login，并确认账号支持 Codex 额度")); return
             }
             apply(result)
         } else if message["method"] as? String == "account/rateLimits/updated", let params = message["params"] as? [String: Any] {
@@ -280,7 +351,7 @@ final class QuotaClient {
         guard let data = try? JSONSerialization.data(withJSONObject: result),
             let response = try? JSONDecoder().decode(QuotaResponse.self, from: data), let bucket = response.codex,
             bucket.primary?.remaining != nil || bucket.secondary?.remaining != nil else {
-            onStatus?("当前登录未提供 Codex 额度数据"); return
+            onStatus?(tr("当前登录未提供 Codex 额度数据")); return
         }
         let merged = partial ? QuotaBucket(primary: bucket.primary ?? latest?.primary, secondary: bucket.secondary ?? latest?.secondary) : bucket
         latest = merged
@@ -292,8 +363,8 @@ final class QuotaClient {
     }
     private func tick() {
         if process == nil { connect(); return }
-        if !initialized, let start = startedAt, Date().timeIntervalSince(start) > 30 { resetConnection("连接超时，稍后自动重试"); return }
-        if let date = pendingAt, Date().timeIntervalSince(date) > 25 { resetConnection("刷新超时，保留上次额度"); return }
+        if !initialized, let start = startedAt, Date().timeIntervalSince(start) > 30 { resetConnection(tr("连接超时，稍后自动重试")); return }
+        if let date = pendingAt, Date().timeIntervalSince(date) > 25 { resetConnection(tr("刷新超时，保留上次额度")); return }
         if initialized && pending == nil && Date().timeIntervalSince(lastRequest) >= 60 { requestLimits(); lastRequest = Date() }
     }
     private var lastRequest = Date()
@@ -310,7 +381,7 @@ final class QuotaClient {
     func reconnect() {
         latest = nil
         onResetCredits?(nil)
-        resetConnection("正在重新连接 Codex CLI")
+        resetConnection(tr("正在重新连接 Codex CLI"))
         retryAt = .distantPast
         connect()
     }
@@ -360,7 +431,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         NSApp.setActivationPolicy(.accessory)
         let frame = NSRect(x: 0, y: 0, width: 286, height: 36)
         panel = BarPanel(contentRect: frame, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
-        panel.title = "Marble 额度条"; panel.isOpaque = false; panel.backgroundColor = .clear
+        panel.title = tr("Marble 额度条"); panel.isOpaque = false; panel.backgroundColor = .clear
         panel.hasShadow = true; panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.hidesOnDeactivate = false; panel.isMovableByWindowBackground = true; panel.delegate = self
@@ -388,7 +459,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         if !UserDefaults.standard.bool(forKey: "desktopOverlayHidden") { panel.orderFrontRegardless() }
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.button?.font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)
-        statusItem.button?.title = "--% | --%"; statusItem.button?.toolTip = "Marble 额度条"; statusItem.menu = makeMenu()
+        statusItem.button?.title = "--% | --%"; statusItem.button?.toolTip = tr("Marble 额度条"); statusItem.menu = makeMenu()
         client.onResetCredits = { [weak self] credits in self?.resetCredits = credits }
         client.onUpdate = { [weak self] bucket in self?.bucket = bucket; self?.updatedAt = Date(); self?.failure = nil; self?.render() }
         client.onStatus = { [weak self] message in self?.failure = message; self?.render() }
@@ -409,11 +480,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         let stale = failure != nil || updatedAt.map { Date().timeIntervalSince($0) > 150 } ?? true
         dot.textColor = stale ? .systemOrange : .systemGreen
         let formatter = DateFormatter(); formatter.timeZone = Formatter.zone; formatter.dateFormat = "HH:mm:ss"
-        var detail = "Codex 剩余额度\n" + Formatter.detail(bucket?.primary, name: "5 小时") + "\n" + Formatter.detail(bucket?.secondary, name: "每周")
-        if let updated = updatedAt { detail += "\n上次更新：\(formatter.string(from: updated))" }
-        if let failure = failure { detail += "\n\(failure)；当前显示可能已过期" }
-        else if stale { detail += bucket == nil ? "\n正在连接…" : "\n数据已过期，正在重试" }
-        detail += "\n拖动调整位置 · 右键打开菜单"
+        var detail = tr("Codex 剩余额度") + "\n" + Formatter.detail(bucket?.primary, name: tr("5 小时")) + "\n" + Formatter.detail(bucket?.secondary, name: tr("每周"))
+        if let updated = updatedAt { detail += (AppLanguage.current == .english ? "\nLast updated: " : "\n上次更新：") + formatter.string(from: updated) }
+        if let failure = failure { detail += "\n" + tr(failure) + (AppLanguage.current == .english ? "; displayed data may be stale" : "；当前显示可能已过期") }
+        else if stale { detail += bucket == nil ? tr("\n正在连接…") : tr("\n数据已过期，正在重试") }
+        detail += "\n" + tr("拖动调整位置 · 右键打开菜单")
         panel.contentView?.toolTip = detail; left.toolTip = detail; right.toolTip = detail
         let menuUsageText = [showPrimary ? left.stringValue : nil, showSecondary ? right.stringValue : nil].compactMap { $0 }.joined(separator: " | ")
         if showPrimary || showSecondary {
@@ -421,21 +492,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             statusItem.button?.title = ""; statusItem.button?.image = menuImage
             statusItem.button?.imagePosition = .imageOnly; statusItem.length = menuImage.size.width
         } else {
-            statusItem.button?.image = nil; statusItem.button?.title = "额度"
+            statusItem.button?.image = nil; statusItem.button?.title = tr("额度")
             statusItem.length = NSStatusItem.variableLength
         }
-        statusItem.button?.toolTip = detail.replacingOccurrences(of: "拖动调整位置 · 右键打开菜单", with: "点击查看额度详情和操作")
-        statusItem.button?.setAccessibilityLabel("Codex 剩余额度")
-        statusItem.button?.setAccessibilityValue((menuUsageText.isEmpty ? "用量显示已关闭" : menuUsageText) + (stale ? "，数据待刷新" : ""))
-        panel.setAccessibilityLabel("Codex 剩余额度"); panel.setAccessibilityValue(left.stringValue + " | " + right.stringValue + (stale ? "，数据待刷新" : ""))
+        statusItem.button?.toolTip = detail.replacingOccurrences(of: tr("拖动调整位置 · 右键打开菜单"), with: tr("点击查看额度详情和操作"))
+        statusItem.button?.setAccessibilityLabel(tr("Codex 剩余额度"))
+        statusItem.button?.setAccessibilityValue((menuUsageText.isEmpty ? tr("用量显示已关闭") : menuUsageText) + (stale ? tr("，数据待刷新") : ""))
+        panel.setAccessibilityLabel(tr("Codex 剩余额度")); panel.setAccessibilityValue(left.stringValue + " | " + right.stringValue + (stale ? tr("，数据待刷新") : ""))
         if !menuTracking { statusItem.menu = makeMenu() }
     }
     func makeMenu() -> NSMenu {
-        let menu = NSMenu(title: "Marble 额度条")
+        let menu = NSMenu(title: tr("Marble 额度条"))
         menu.delegate = self
-        let title = NSMenuItem(title: "Codex 剩余额度", action: nil, keyEquivalent: ""); title.isEnabled = false; menu.addItem(title)
+        let title = NSMenuItem(title: tr("Codex 剩余额度"), action: nil, keyEquivalent: ""); title.isEnabled = false; menu.addItem(title)
         if let bucket = bucket {
-            for entry in [Formatter.detail(bucket.primary, name: "5 小时"), Formatter.detail(bucket.secondary, name: "每周")] {
+            for entry in [Formatter.detail(bucket.primary, name: tr("5 小时")), Formatter.detail(bucket.secondary, name: tr("每周"))] {
                 let item = NSMenuItem(title: entry, action: nil, keyEquivalent: ""); item.isEnabled = false; menu.addItem(item)
             }
         }
@@ -444,42 +515,58 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             let item = NSMenuItem(title: text, action: nil, keyEquivalent: "")
             item.isEnabled = false; menu.addItem(item)
         }
-        if let failure = failure { let item = NSMenuItem(title: failure, action: nil, keyEquivalent: ""); item.isEnabled = false; menu.addItem(item) }
+        if let failure = failure { let item = NSMenuItem(title: tr(failure), action: nil, keyEquivalent: ""); item.isEnabled = false; menu.addItem(item) }
         menu.addItem(.separator())
-        add(menu, "立即刷新", #selector(refreshNow), "r")
-        let primaryToggle = add(menu, "显示 5 小时用量", #selector(togglePrimary)); primaryToggle.state = showPrimary ? .on : .off
-        let secondaryToggle = add(menu, "显示周用量", #selector(toggleSecondary)); secondaryToggle.state = showSecondary ? .on : .off
+        add(menu, tr("立即刷新"), #selector(refreshNow), "r")
+        let primaryToggle = add(menu, tr("显示 5 小时用量"), #selector(togglePrimary)); primaryToggle.state = showPrimary ? .on : .off
+        let secondaryToggle = add(menu, tr("显示周用量"), #selector(toggleSecondary)); secondaryToggle.state = showSecondary ? .on : .off
         menu.addItem(.separator())
-        add(menu, panel?.isVisible == false ? "显示桌面悬浮条" : "关闭桌面悬浮条", #selector(toggleVisible))
-        add(menu, "移回屏幕右上角", #selector(resetPosition))
-        let format = add(menu, "使用 24 小时制", #selector(toggleTime)); format.state = twelveHour ? .off : .on
+        add(menu, panel?.isVisible == false ? tr("显示桌面悬浮条") : tr("关闭桌面悬浮条"), #selector(toggleVisible))
+        add(menu, tr("移回屏幕右上角"), #selector(resetPosition))
+        let format = add(menu, tr("使用 24 小时制"), #selector(toggleTime)); format.state = twelveHour ? .off : .on
         menu.addItem(.separator())
-        add(menu, "选择 Codex CLI…", #selector(chooseCLI))
-        add(menu, "安装与登录说明…", #selector(showSetupHelp))
-        menu.addItem(.separator()); add(menu, "退出额度条", #selector(quit), "q")
+        let languageMenu = NSMenu(title: "语言 / Language")
+        let chinese = add(languageMenu, "简体中文", #selector(selectChinese)); chinese.state = AppLanguage.current == .chinese ? .on : .off
+        let english = add(languageMenu, "English", #selector(selectEnglish)); english.state = AppLanguage.current == .english ? .on : .off
+        let languageItem = NSMenuItem(title: "语言 / Language", action: nil, keyEquivalent: "")
+        languageItem.submenu = languageMenu; menu.addItem(languageItem)
+        add(menu, tr("选择 Codex CLI…"), #selector(chooseCLI))
+        add(menu, tr("安装与登录说明…"), #selector(showSetupHelp))
+        menu.addItem(.separator()); add(menu, tr("退出额度条"), #selector(quit), "q")
         return menu
     }
     @discardableResult private func add(_ menu: NSMenu, _ title: String, _ action: Selector, _ key: String = "") -> NSMenuItem {
         let item = NSMenuItem(title: title, action: action, keyEquivalent: key); item.target = self; menu.addItem(item); return item
     }
+    private func setLanguage(_ language: AppLanguage) {
+        language.save()
+        panel.title = tr("Marble 额度条")
+        render()
+    }
+    @objc private func selectChinese() { setLanguage(.chinese) }
+    @objc private func selectEnglish() { setLanguage(.english) }
     @objc private func chooseCLI() {
         let picker = NSOpenPanel()
-        picker.title = "选择已安装的 Codex CLI 可执行文件"
-        picker.message = "可在终端运行 which codex 查看位置。请仅选择你信任的 Codex CLI。"
+        picker.title = tr("选择已安装的 Codex CLI 可执行文件")
+        picker.message = tr("可在终端运行 which codex 查看位置。请仅选择你信任的 Codex CLI。")
         picker.canChooseFiles = true; picker.canChooseDirectories = false
         picker.allowsMultipleSelection = false; picker.showsHiddenFiles = true
+        picker.prompt = tr("选择"); picker.nameFieldLabel = tr("选择")
         NSApp.activate(ignoringOtherApps: true)
         guard picker.runModal() == .OK, let url = picker.url else { return }
         guard FileManager.default.isExecutableFile(atPath: url.path) else {
-            let alert = NSAlert(); alert.messageText = "所选文件不可执行"; alert.informativeText = "请选择 Codex CLI 可执行文件。"; alert.runModal(); return
+            let alert = NSAlert(); alert.messageText = tr("所选文件不可执行"); alert.informativeText = tr("请选择 Codex CLI 可执行文件。"); alert.addButton(withTitle: tr("好")); alert.runModal(); return
         }
         UserDefaults.standard.set(url.path, forKey: "codexExecutablePath")
         bucket = nil; resetCredits = nil; updatedAt = nil
         client.reconnect()
     }
     @objc private func showSetupHelp() {
-        let alert = NSAlert(); alert.messageText = "额度条使用条件"
-        alert.informativeText = "需要 macOS 13 或更新版本，以及已安装的 Codex CLI。\n\n1. 用你自己的 ChatGPT 账号运行 codex login。\n2. 终端运行 which codex 查看位置。\n3. 如果没有自动找到，点击菜单中的「选择 Codex CLI…」。\n\n支持 Apple 芯片和 Intel。额度、重置券是否提供取决于账号及 CLI 版本；仅使用 API Key 的登录不保证提供这些额度。所有重置时间显示为北京时间。"
+        let alert = NSAlert(); alert.messageText = tr("额度条使用条件")
+        alert.informativeText = AppLanguage.current == .english
+            ? "Requires macOS 13 or later and an installed Codex CLI.\n\n1. Run codex login with your own ChatGPT account.\n2. Run which codex in Terminal to find its path.\n3. If discovery fails, use Select Codex CLI… in the menu.\n\nApple Silicon and Intel binaries are included. Quota and reset credit details depend on your account and CLI version. API-key-only sign-in may not provide subscription quotas. All reset times use UTC+8."
+            : "需要 macOS 13 或更新版本，以及已安装的 Codex CLI。\n\n1. 用你自己的 ChatGPT 账号运行 codex login。\n2. 终端运行 which codex 查看位置。\n3. 如果没有自动找到，点击菜单中的「选择 Codex CLI…」。\n\n支持 Apple 芯片和 Intel。额度、重置券是否提供取决于账号及 CLI 版本；仅使用 API Key 的登录不保证提供这些额度。所有重置时间显示为北京时间。"
+        alert.addButton(withTitle: tr("好"))
         NSApp.activate(ignoringOtherApps: true); alert.runModal()
     }
     @objc private func refreshNow() { client.refresh() }
@@ -521,6 +608,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
 }
 
 func runSelfTests() throws {
+    let previousLanguage = AppLanguage.testOverride
+    AppLanguage.testOverride = .chinese
+    defer { AppLanguage.testOverride = previousLanguage }
+
     func decode(_ string: String) throws -> QuotaResponse { try JSONDecoder().decode(QuotaResponse.self, from: Data(string.utf8)) }
     let result = try decode("""
     {"rateLimits":{"primary":{"usedPercent":99}},"rateLimitsByLimitId":{"codex":{"primary":{"usedPercent":14,"windowDurationMins":300,"resetsAt":1577947920},"secondary":{"usedPercent":2,"windowDurationMins":10080,"resetsAt":1578556800}}}}
@@ -545,7 +636,7 @@ func runSelfTests() throws {
     precondition(Formatter.resetMenuTitles(joint.rateLimitResetCredits, loading: false) == [
         "5 小时重置次数：0 次", "每周重置次数：0 次", "完全重置次数：1 次"
     ])
-    precondition(Formatter.resetMenuTitles(resets.rateLimitResetCredits, loading: false).allSatisfy { $0.contains("未提供明细") })
+    precondition(Formatter.resetMenuTitles(resets.rateLimitResetCredits, loading: false).allSatisfy { $0.contains(tr("未提供明细")) })
     precondition(zeroResets.rateLimitResetCredits?.categoryCounts == [0, 0, 0])
     let mixed = ResetCredits(availableCount: 4, credits: [
         ResetCredit(resetType: "codexRateLimits", status: "available", title: "5 hr reset"),
@@ -573,18 +664,61 @@ func runSelfTests() throws {
     precondition(QuotaClient.permitsMethod("account/rateLimits/read"))
     precondition(!QuotaClient.permitsMethod("thread/start") && !QuotaClient.permitsMethod("turn/start") && !QuotaClient.permitsMethod("account/rateLimits/reset"))
     print("PASS: helper environment strips unrelated secrets; outgoing RPC method allowlist")
+    AppLanguage.testOverride = .english
+    precondition(Formatter.resetMenuTitles(joint.rateLimitResetCredits, loading: false) == ["5-hour reset credits: 0", "Weekly reset credits: 0", "Full reset credits: 1"])
+    precondition(Formatter.detail(result.codex?.primary, name: "5 小时").contains("86% remaining"))
+    precondition(Formatter.detail(nil, name: "每周") == "Weekly: Data unavailable")
+    precondition(Formatter.resetMenuTitles(resets.rateLimitResetCredits, loading: false).allSatisfy { $0.contains("Details unavailable") })
+    precondition(tr("显示周用量") == "Show weekly quota")
+    for text in englishStrings.values {
+        precondition(!text.unicodeScalars.contains { (0x3400...0x9FFF).contains(Int($0.value)) || (0xF900...0xFAFF).contains(Int($0.value)) })
+    }
+    let suiteName = "quota-language-selftest-" + UUID().uuidString
+    let isolated = UserDefaults(suiteName: suiteName)!
+    precondition(AppLanguage.saved(in: isolated) == .chinese)
+    AppLanguage.english.save(in: isolated)
+    precondition(AppLanguage.saved(in: UserDefaults(suiteName: suiteName)!) == .english)
+    AppLanguage.chinese.save(in: isolated)
+    precondition(AppLanguage.saved(in: isolated) == .chinese)
+    isolated.removePersistentDomain(forName: suiteName)
+    AppLanguage.testOverride = .chinese
+    print("PASS: English/Chinese quota details, independent reset labels, translations and persisted language selection")
     print("PASS: quota bucket selection, remaining %, timezone, 12/24h, missing values, clamps")
+}
+func runMenuTests() {
+    _ = NSApplication.shared
+    NSApp.setActivationPolicy(.accessory)
+    let previousLanguage = AppLanguage.testOverride
+    defer { AppLanguage.testOverride = previousLanguage }
+    let delegate = AppDelegate()
+    for language in AppLanguage.allCases {
+        AppLanguage.testOverride = language
+        let menu = delegate.makeMenu()
+        let expected = language == .english ? "Show weekly quota" : "显示周用量"
+        precondition(menu.items.contains { $0.title == expected })
+        let languageItem = menu.items.first { $0.title == "语言 / Language" }!
+        let choices = languageItem.submenu!.items
+        precondition(choices.map { $0.title } == ["简体中文", "English"])
+        precondition(choices[language == .english ? 1 : 0].state == .on)
+        if language == .english {
+            for item in menu.items where item !== languageItem {
+                precondition(!item.title.unicodeScalars.contains { (0x3400...0x9FFF).contains(Int($0.value)) })
+            }
+        }
+    }
+    print("PASS: native English/Chinese menus, language submenu and selected-language checkmark")
 }
 // Connection checks emit capability flags only, never percentages, account IDs,
 // reset timestamps, credit IDs, raw protocol responses or credentials.
 func checkConnection() -> Int32 {
+    AppLanguage.testOverride = .english
     let client = QuotaClient()
     var result: Int32? = nil
     client.onUpdate = { bucket in
         print("CONNECTED primary=\(bucket.primary?.remaining != nil) weekly=\(bucket.secondary?.remaining != nil)")
         result = 0
     }
-    client.onStatus = { message in print("UNAVAILABLE: \(message)"); result = 1 }
+    client.onStatus = { message in print("UNAVAILABLE: \(tr(message))"); result = 1 }
     client.start()
     let deadline = Date().addingTimeInterval(35)
     while result == nil && Date() < deadline { RunLoop.main.run(until: Date().addingTimeInterval(0.05)) }
@@ -594,6 +728,7 @@ func checkConnection() -> Int32 {
 }
 signal(SIGPIPE, SIG_IGN)
 if CommandLine.arguments.contains("--check-connection") { exit(checkConnection()) }
+if CommandLine.arguments.contains("--menu-self-test") { runMenuTests(); exit(0) }
 if CommandLine.arguments.contains("--self-test") { try runSelfTests(); exit(0) }
 let app = NSApplication.shared
 if let identifier = Bundle.main.bundleIdentifier,

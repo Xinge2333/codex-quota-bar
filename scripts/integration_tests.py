@@ -63,7 +63,7 @@ def main():
             if expected == 0:
                 assert 'CONNECTED primary=true' in result.stdout
                 assert f'weekly={"false" if case == "one_window" else "true"}' in result.stdout
-            if case == 'unsupported': assert '升级' in result.stdout
+            if case == 'unsupported': assert 'Update Codex CLI' in result.stdout
             if record.exists():
                 assert record.read_text().splitlines()[:3] == ['initialize', 'initialized', 'account/rateLimits/read']
             print(f'PASS: {case}', flush=True)
