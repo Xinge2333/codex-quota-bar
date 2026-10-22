@@ -10,6 +10,12 @@ A small macOS menu bar app with an optional floating desktop bar for your remain
 - [Release notes and all assets](https://github.com/Xinge2333/codex-quota-bar/releases/tag/v1.2.0)
 - [SHA256SUMS](https://github.com/Xinge2333/codex-quota-bar/releases/download/v1.2.0/SHA256SUMS)
 
+You can also copy and paste this prompt into Codex:
+
+```text
+Please help me download and configure this quota bar. Software URL: https://github.com/Xinge2333/codex-quota-bar
+```
+
 **This is an unsigned-by-Developer-ID, unnotarized test release.** It has an ad-hoc signature, but macOS Gatekeeper may block an internet download. Do not disable system security protections. If macOS refuses to open it, wait for a properly Developer ID-signed and notarized release, or review the source and build locally.
 
 ## Screenshots

@@ -10,6 +10,12 @@
 - [发行说明与全部附件](https://github.com/Xinge2333/codex-quota-bar/releases/tag/v1.2.0)
 - [SHA-256 校验文件](https://github.com/Xinge2333/codex-quota-bar/releases/download/v1.2.0/SHA256SUMS)
 
+也可以直接复制下面这段话给 Codex：
+
+```text
+请帮我下载并且配置这个额度条，软件地址：https://github.com/Xinge2333/codex-quota-bar
+```
+
 这是**未公证的测试版**，不是零配置安装包。请先阅读下方安装要求。无需编程环境即可运行已打包应用，但需要自己安装和登录 Codex CLI。
 
 ## 界面预览
