@@ -1,0 +1,37 @@
+Codex Quota Bar 1.2.0 — universal macOS test build
+
+Requirements: macOS 13+, a trusted Codex CLI installation, and your own ChatGPT sign-in.
+The binary contains Apple Silicon and Intel slices. Intel and macOS 13 have not been tested on physical machines.
+No account, cookie, token or Codex CLI executable is included.
+
+1. Install Codex CLI: https://learn.chatgpt.com/docs/codex/cli
+2. Run codex login in Terminal and sign in with your own account.
+3. Extract the ZIP and move 额度条.app to Applications.
+4. If the app cannot find the CLI, run which codex, then choose 选择 Codex CLI… (Select Codex CLI…) from the app menu.
+
+IMPORTANT: This build is ad-hoc signed, not Developer ID-signed or notarized.
+Gatekeeper may block an internet download. Do not disable macOS security protections.
+If macOS refuses to open it, wait for a properly signed and notarized release or review and build the source locally.
+
+The app interface is currently in Chinese:
+立即刷新 = Refresh now
+显示 5 小时用量 = Show five-hour quota
+显示周用量 = Show weekly quota
+显示桌面悬浮条 / 关闭桌面悬浮条 = Show / hide the desktop bar
+使用 24 小时制 = Use 24-hour time
+退出额度条 = Quit
+
+Numbers are remaining percentages. The small line is the quota reset time/date, not the last polling time.
+All times use Asia/Shanghai (UTC+8). Automatic refresh: every 60 seconds.
+Each column can be toggled separately. If both are hidden, the 额度 (Quota) menu remains available.
+Drag the floating bar to move it; right-click it to open the menu.
+
+Reset credits are separate: five-hour-only, weekly-only and full resets.
+One full-reset credit is displayed as 0 / 0 / 1. Unknown details are not guessed.
+The app never redeems credits or starts model generation.
+
+No pet or running desktop chat window is required. The CLI must remain installed.
+API-key-only login does not necessarily provide subscription quotas.
+Settings stay local. This version does not enable launch at login; reopen it from Applications after a restart.
+
+Full English guide: https://github.com/Xinge2333/codex-quota-bar/blob/main/README.en.md

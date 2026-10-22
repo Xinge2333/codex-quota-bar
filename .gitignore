@@ -1,0 +1,13 @@
+.DS_Store
+._*
+__MACOSX/
+dist/
+.build/
+__pycache__/
+*.pyc
+.env
+.env.*
+auth.json
+*.log
+menu-bar-verification.json
+menu-bar-preview.png

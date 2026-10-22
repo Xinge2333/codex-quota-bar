@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-22",
+  "version": "1.2.0",
+  "security": {
+    "source_and_package_scan": "pass_with_heuristic_limitations",
+    "package_file_count": 5,
+    "runtime_diagnostics_export_removed": true,
+    "unrelated_environment_secrets_stripped": true,
+    "outgoing_rpc_allowlist": [
+      "initialize",
+      "initialized",
+      "account/rateLimits/read"
+    ],
+    "incoming_protocol_buffer_limit_bytes": 1048576,
+    "actual_login_files_opened_for_audit": false,
+    "unrelated_pet_assets_in_release": false,
+    "documentation_images": "Two author-provided UI screenshots intentionally included in repository docs, with PNG text/EXIF metadata stripped; no images in binary package"
+  },
+  "compatibility": {
+    "architectures": [
+      "arm64",
+      "x86_64"
+    ],
+    "deployment_target": "13.0",
+    "tested_host_macos": "26.6.2",
+    "arm64_self_tests": "pass",
+    "intel_execution": "not tested; Rosetta unavailable on host",
+    "macos_13_execution": "not tested; no macOS 13 host",
+    "real_cli_version": "0.154.0",
+    "real_connection": {
+      "primary": true,
+      "weekly": true
+    },
+    "offline_scenarios_passed": [
+      "success",
+      "one_window",
+      "no_credits",
+      "not_logged_in",
+      "unsupported",
+      "missing_data",
+      "oversized",
+      "closed",
+      "timeout",
+      "missing_cli"
+    ],
+    "dependencies": "system macOS frameworks plus separately installed trusted Codex CLI; no personal login bundled",
+    "npm_node_launcher_with_spaces": "pass; selected bin supplies node while parent PATH lacks node",
+    "gui_interaction": "new CLI chooser compiled; not interactively tested"
+  },
+  "distribution": {
+    "signature": "ad-hoc with hardened runtime",
+    "developer_id_identities_available": 0,
+    "apple_notarization": "not performed",
+    "gatekeeper_assessment": "rejected",
+    "ready_for_unrestricted_public_binary_distribution": false
+  },
+  "artifact": {
+    "filename": "CodexQuotaBar-v1.2.0-macos-universal.zip",
+    "sha256": "4ba90b6f281cd4722a3328e45315ad8ff6245f1bb1bf11036aaf9c5bca18c863",
+    "bytes": 155200
+  },
+  "check_run_did_not_publish": true
+}
