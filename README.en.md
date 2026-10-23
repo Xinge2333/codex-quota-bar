@@ -22,13 +22,13 @@ Please help me download and configure this quota bar. Software URL: https://gith
 
 Both five-hour and weekly remaining quota:
 
-![Both quota columns and the menu](docs/images/menu-both-quotas.png)
+![Both quota columns and the menu](docs/images/menu-both-quotas-en.png)
 
 Five-hour quota only, with the weekly column independently disabled:
 
-![Weekly column disabled](docs/images/menu-five-hour-only.png)
+![Weekly column disabled](docs/images/menu-five-hour-only-en.png)
 
-Screenshots are provided by the author. Values are examples captured at that time, not your current allowance. The screenshots show the Chinese interface; the current build also includes language selection, CLI selection and setup-help entries.
+Screenshots are provided by the author. Values are examples captured at that time, not your current allowance. The screenshots show the English interface, including language selection, CLI selection and setup-help entries.
 
 ## Requirements
 
